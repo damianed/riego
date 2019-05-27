@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riego</title>
+    <style>
+         /* The switch - the box around the slider */
+        .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        /* The slider */
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        input:checked + .slider {
+        background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+        border-radius: 34px;
+        }
+
+        .slider.round:before {
+        border-radius: 50%;
+        } 
+    </style>
+    <link rel="stylesheet" href="{% static 'riego/css/bootstrap.min.css' %}"></link>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    </head>
+<body>
+    <div style="width:60%;margin-left:20%">
+        <label for="consumo">Consumo por:</label>
+        <select name="consumo" id="consumo">
+            <option value="day">Día</option>
+            <option value="month">Mes</option>
+        </select>    
+        <div style="width:100%">
+            <canvas id="char"></canvas>
+        </div>
+        <div class="row text-center justify-content-center mt-5">
+            <div class="card w-75 bg-light mb-3 ml-3" style="max-width: 12rem;">
+                <div class="card-header">Sistema de riego</div>
+                <div class="card-body">
+                    <h5 class="card-title" id="estadolabel">Apagado</h5>
+                    <label class="switch">
+                            <input id="estado" type="checkbox">
+                            <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="card w-75 bg-light mb-3 ml-3" style="max-width: 12rem;">
+                    <div class="card-header">Humedad</div>
+                    <div class="card-body">
+                        <h5 class="card-title">80%</h5>
+                    </div>
+            </div>
+            <div class="card w-75 bg-light mb-3 ml-3" style="max-width: 12rem;">
+                    <div class="card-header">Lluvia</div>
+                    <div class="card-body">
+                        <h5 class="card-title">lloviendo</h5>
+                        <i style="font-size:25px" class="fas fa-cloud-rain"></i>
+                        <!-- <i class="fas fa-sun"></i> -->
+                    </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{% static 'riego/js/bootstrap.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+              
+        createGraphDay();
+        changeText();
+
+        let consumo = document.getElementById("consumo");
+        consumo.addEventListener('change', function(){
+            if(this.value == 'day'){
+                createGraphDay();
+            }else if(this.value == 'month'){
+                createGraphMonth();
+            }
+        });
+
+        document.getElementById("estado").addEventListener('change', function(){
+            changeText();
+        });
+        
+        function changeText(){
+            var estado = document.getElementById("estado");
+            if(estado.checked){
+                document.getElementById("estadolabel").innerHTML = "Encendido";
+            }else{
+                document.getElementById("estadolabel").innerHTML = "Apagado";
+            }
+        }
+        function createGraphDay(){
+        var canvas = document.getElementById('char');
+        canvas.parentNode.style.display = "inline-block";
+        // canvas.parentNode.style.width = "40%";
+        // canvas.parentNode.style.marginLeft = "10%";
+        var ctx = canvas.getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'Grafica por Dia',
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: [0, 10, 5, 2, 20, 30, 45]
+                }]
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+        }
+        function createGraphMonth(){
+        var canvas = document.getElementById('char');
+        canvas.parentNode.style.display = "inline-block";
+        // canvas.parentNode.style.width = "40%";
+        ctx = canvas.getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'Grafica por mes',
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                    borderColor: 'rgb(39, 216, 118)',
+                    data: [0, 10, 5, 2, 20, 30, 45]
+                }]
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+        }
+    </script>
+</body>
+</html>
