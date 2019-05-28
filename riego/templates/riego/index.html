@@ -76,117 +76,154 @@
 <body>
     <div style="width:60%;margin-left:20%">
         <label for="consumo">Consumo por:</label>
-        <select name="consumo" id="consumo">
-            <option value="day">Día</option>
-            <option value="month">Mes</option>
-        </select>    
+        <input id="fecha" type="date"> 
         <div style="width:100%">
             <canvas id="char"></canvas>
         </div>
         <div class="row text-center justify-content-center mt-5">
             <div class="card w-75 bg-light mb-3 ml-3" style="max-width: 12rem;">
-                <div class="card-header">Sistema de riego</div>
+                <div class="card-header">Frozar Regado</div>
                 <div class="card-body">
                     <h5 class="card-title" id="estadolabel">Apagado</h5>
+                    <label class="switch">                            
+                        <input id="estado" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="card w-75 bg-light mb-3 ml-3" style="max-width: 12rem;">
+                <div class="card-header">Estado</div>
+                <div class="card-body">
+                    <h5 class="card-title" id="estadolabel">
+                    {% if propiedades.Encendido %}
+                        Regando
+                    {% else %}
+                        Apagado
+                    {% endif %}
+                    </h5>
                     <label class="switch">
-                            <input id="estado" type="checkbox">
-                            <span class="slider round"></span>
                     </label>
                 </div>
             </div>
             <div class="card w-75 bg-light mb-3 ml-3" style="max-width: 12rem;">
                     <div class="card-header">Humedad</div>
                     <div class="card-body">
-                        <h5 class="card-title">80%</h5>
+                        <h5 class="card-title">{{ propiedades.Humedad }}%</h5>
                     </div>
             </div>
             <div class="card w-75 bg-light mb-3 ml-3" style="max-width: 12rem;">
                     <div class="card-header">Lluvia</div>
                     <div class="card-body">
-                        <h5 class="card-title">lloviendo</h5>
-                        <i style="font-size:25px" class="fas fa-cloud-rain"></i>
-                        <!-- <i class="fas fa-sun"></i> -->
+                        {% if propiedades.Lluvia %}
+                            <h5 class="card-title">lloviendo</h5>
+                            <i style="font-size:25px" class="fas fa-cloud-rain"></i>
+                        {% else %}
+                            <h5 class="card-title">Sin lluvia</h5>
+                            <i style="font-size:25px" class="fas fa-sun"></i>
+                        {% endif %}
                     </div>
             </div>
         </div>
     </div>
     <script type="text/javascript" src="{% static 'riego/js/bootstrap.min.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+			integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			crossorigin="anonymous"></script>
+		
     <script>
-              
-        createGraphDay();
-        changeText();
+        $(document).ready(function(){
 
-        let consumo = document.getElementById("consumo");
-        consumo.addEventListener('change', function(){
-            if(this.value == 'day'){
-                createGraphDay();
-            }else if(this.value == 'month'){
-                createGraphMonth();
-            }
-        });
-
-        document.getElementById("estado").addEventListener('change', function(){
+            createGraphDay();
             changeText();
-        });
-        
-        function changeText(){
-            var estado = document.getElementById("estado");
-            if(estado.checked){
-                document.getElementById("estadolabel").innerHTML = "Encendido";
-            }else{
-                document.getElementById("estadolabel").innerHTML = "Apagado";
+            let consumo = document.getElementById("consumo");
+            consumo.addEventListener('change', function(){
+                if(this.value == 'day'){
+                    createGraphDay();
+                }else if(this.value == 'month'){
+                    createGraphMonth();
+                }
+            });
+
+            document.getElementById("estado").addEventListener('change', function(){
+                changeText();
+            });
+            
+            function changeText(){
+                var estado = document.getElementById("estado");
+                if(estado.checked){
+                    document.getElementById("estadolabel").innerHTML = "Encendido";
+                }else{
+                    document.getElementById("estadolabel").innerHTML = "Apagado";
+                }
             }
-        }
-        function createGraphDay(){
-        var canvas = document.getElementById('char');
-        canvas.parentNode.style.display = "inline-block";
-        // canvas.parentNode.style.width = "40%";
-        // canvas.parentNode.style.marginLeft = "10%";
-        var ctx = canvas.getContext('2d');
-        var chart = new Chart(ctx, {
-            // The type of chart we want to create
-            type: 'line',
+            function createGraphDay(){
+                let fecha = document.getElementById("fecha");
+                let today = new Date();
+                fecha.type = "date";
+                fecha.value = today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,'0')+"-"+String(today.getDate()).padStart(2,'0');
+                var canvas = document.getElementById('char');
+                canvas.parentNode.style.display = "inline-block";
+                // canvas.parentNode.style.width = "40%";
+                // canvas.parentNode.style.marginLeft = "10%";
+                var ctx = canvas.getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
 
-            // The data for our dataset
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Grafica por Dia',
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: [0, 10, 5, 2, 20, 30, 45]
-                }]
-            },
+                    // The data for our dataset
+                    data: {
+                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                        datasets: [{
+                            label: 'Grafica por Dia',
+                            backgroundColor: 'rgba(0, 0, 0, 0)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            data: [0, 10, 5, 2, 20, 30, 45]
+                        }]
+                    },
 
-            // Configuration options go here
-            options: {}
-        });
-        }
-        function createGraphMonth(){
-        var canvas = document.getElementById('char');
-        canvas.parentNode.style.display = "inline-block";
-        // canvas.parentNode.style.width = "40%";
-        ctx = canvas.getContext('2d');
-        var chart = new Chart(ctx, {
-            // The type of chart we want to create
-            type: 'line',
+                    // Configuration options go here
+                    options: {}
+                });
+            }
+            function createGraphMonth(){
+                let fecha = document.getElementById("fecha");
+                let today = new Date();
+                fecha.type = "month";
+                fecha.value = today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2, '0');
+                var canvas = document.getElementById('char');
+                canvas.parentNode.style.display = "inline-block";
+                // canvas.parentNode.style.width = "40%";
+                ctx = canvas.getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
 
-            // The data for our dataset
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Grafica por mes',
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    borderColor: 'rgb(39, 216, 118)',
-                    data: [0, 10, 5, 2, 20, 30, 45]
-                }]
-            },
+                    // The data for our dataset
+                    data: {
+                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                        datasets: [{
+                            label: 'Grafica por mes',
+                            backgroundColor: 'rgba(0, 0, 0, 0)',
+                            borderColor: 'rgb(39, 216, 118)',
+                            data: [0, 10, 5, 2, 20, 30, 45]
+                        }]
+                    },
 
-            // Configuration options go here
-            options: {}
-        });
-        }
+                    // Configuration options go here
+                    options: {}
+                });
+            }
+
+            var intervalID = window.setInterval(updateData, 1000);
+
+            function updateData() {
+                let fecha = document.getElementById("fecha");
+                $.get("getData", {date:fecha.value, tipo: consumo.value}, function(data){
+                    console.log(data);
+                });
+            }
+        });     
     </script>
 </body>
 </html>
